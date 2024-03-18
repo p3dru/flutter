@@ -8,7 +8,14 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   final UserController _userController = UserController();
 
   @override
@@ -18,26 +25,23 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(title: Text('Crud with MVC')),
         body: Column(
           children: [
-            UserForm(
-              onSubmit: (name, email, id) {
+            UserForm(onSubmit: (name, email, id) {
+              setState(() {
                 _userController.addUser(User(id: id, name: name, email: email));
-                setState(() {});
-              },
-            ),
+              });
+            }),
             Expanded(
-              child: UserListView(
-                users: _userController.users,
-                onDelete: (id) {
+                child: UserListView(
+              users: _userController.users,
+              onDelete: (id) {
+                setState(() {
                   _userController.removeUser(id);
-                  setState(() {});
-                },
-              ),
-            ),
+                });
+              },
+            ))
           ],
         ),
       ),
     );
   }
-
-  void setState(Null Function() param0) {}
 }
