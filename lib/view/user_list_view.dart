@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:user_mvc/model/user.dart';
+import 'package:user_mvc/view/user_edit_form.dart';
 
 //como stateless, essa view é imutável (não dinâmico)
-class UserListView extends StatelessWidget {
+class UserListView extends StatefulWidget {
   /*
   criamos uma lista imutável e que pode ser atribuída posteriormente de nome
   users.
@@ -34,11 +35,26 @@ class UserListView extends StatelessWidget {
   irá editar o item na lista. 
   */
   const UserListView(
-      {super.key,
+      {Key? key,
       required this.users,
       required this.onDelete,
-      required this.onEdit});
+      required this.onEdit})
+      : super(key: key);
 
+  @override
+  /*
+  "createState()" é um método abstrato que retorna uma instância de State que é
+  usada pelo flutter para construir a interface de usuário do widget. O tipo
+  _UserListViewState indica que o estado retornado por esse método é 
+  específico para o widget UserListView.
+  "=> _UserListViewState()", permite retornar o resultado de uma expressão
+  diretamente. Nesse caso, ele está retornando uma nova instância de 
+  _UserListViewState().
+  */
+  _UserListViewState createState() => _UserListViewState();
+}
+
+class _UserListViewState extends State<UserListView> {
   @override
   //construímos a interface do usuário do widget
   Widget build(BuildContext context) {
@@ -49,21 +65,26 @@ class UserListView extends StatelessWidget {
     */
     return ListView.builder(
       //propriedade que especifica o número de itens na lista
-      itemCount: users.length,
+      itemCount: widget.users.length,
       /*
       função chamada para cada item na lista, dentro da função, definimos
       como cada item deve ser construído
       */
       itemBuilder: (context, index) {
         //obtém o usuário atual usando o index
-        final user = users[index];
+        /*
+        "widget." é uma referência ao widget pai que permite acessar seus
+        objetos e métodos visto que esses métodos estão inacessíveis para a 
+        classe atual
+        */
+        final user = widget.users[index];
         /*
         ListTile é um widget que representa um item de lista como um título,
         subtítulo e um ícone de ação
         */
         return ListTile(
             //define os atributos a serem exibidos
-            title: Text(user.email),
+            title: Text(user.name),
             subtitle: Text(user.email),
             /*
           adiciona um botão de ícone no final do ListTile que chama a função
@@ -78,7 +99,7 @@ class UserListView extends StatelessWidget {
                   aciona a função onDelete quando pressionado passando id do
                   user como parâmetro
                   */
-                  onPressed: () => onDelete(user.id),
+                  onPressed: () => widget.onDelete(user.id),
                 ),
                 IconButton(
                   icon: Icon(Icons.edit),
@@ -86,7 +107,41 @@ class UserListView extends StatelessWidget {
                   aciona a função onEdit quando pressionado passando id do user 
                   como parâmetro
                   */
-                  onPressed: () => onEdit(user.id, user.name, user.email),
+                  onPressed: () {
+                    //cria uma caixa de diálogo quando o botão for pressionado
+                    showDialog(
+                        //passamos o contexto atual
+                        context: context,
+                        builder: (BuildContext context) {
+                          //Cria uma caixa de diálogo (dentro da outra)
+                          return AlertDialog(
+                            //passando o widget/classe UserEditForm como content
+                            content: UserEditForm(
+                              /*
+                              recebe o usuário atual e a função (solicitadas 
+                              como parâmetro) 
+                              */
+                              user: user,
+                              onEdit: (name, email, id) {
+                                //acessa a função onEdit do widget pai
+                                widget.onEdit(id, name, email);
+                                /*print(
+                                  'Name: ${user.name}\nEmail: ${user.email}',
+                                );*/
+                                /*
+                                retorna para o contexto anterior (
+                                user_list_view), uma vez que quando pressionamos
+                                o ícone de edição, uma nova view se abriu
+                                (user_edit_form), empilhando-se sobre a
+                                user_list_view e para voltar para a tela atual,
+                                precisamos desempilhar e a linha abaixo faz isso 
+                                */
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          );
+                        });
+                  },
                 )
               ],
             ));

@@ -65,7 +65,7 @@ class _MyAppState extends State<MyApp> {
               onEdit: (id, name, email) {
                 setState(() {
                   //atualiza o usuário baseado no id
-                  _userController.updateUser(id, name, email);
+                  _userController.updateUser(id, name, email, () {});
                 });
               },
             ))

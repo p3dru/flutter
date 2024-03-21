@@ -35,6 +35,13 @@ class _UserFormState extends State<UserForm> {
   String _name = '';
   String _email = '';
 
+  /*
+  definição dos controladores dos TextField, eles dizem o que o campo de fazer
+  após uma ação específica (mais informações abaixo)
+  */
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -44,11 +51,41 @@ class _UserFormState extends State<UserForm> {
           children: <Widget>[
             //cria textfields
             TextFormField(
+              //o responsável por gerenciar o textField
+              controller: _nameController,
+              //estilizações
               decoration: InputDecoration(labelText: 'Name'),
+              //validadores
+              validator: (value) {
+                /*
+                se o valor dentro do campo for vazio no momento da
+                submissão (clicar no botão add), ele impede o prosseguimento e
+                lança essa "mensagem de erro", é um aviso básico
+                */
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your name';
+                }
+                return null;
+              },
               onChanged: (value) => setState(() => _name = value),
             ),
             TextFormField(
+              //responsável por gerenciar esse campo
+              controller: _emailController,
+              //estilização (simples)
               decoration: InputDecoration(labelText: 'Email'),
+              //validador
+              validator: (value) {
+                /*
+                se o valor dentro do campo for vazio no momento da
+                submissão (clicar no botão add), ele impede o prosseguimento e
+                lança essa "mensagem de erro", é basicamente um aviso
+                */
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email';
+                }
+                return null;
+              },
               onChanged: (value) => setState(() => _email = value),
             ),
             //cria um ElevatedButton
@@ -65,7 +102,14 @@ class _UserFormState extends State<UserForm> {
                   */
                   widget.onSubmit(_name, _email, DateTime.now().toString());
                 }
+                /*
+                limpa os TextFields, isso e os validadores, evitam que caso
+                cliquemos em "add" ele replique os valores guardados no state 
+                */
+                _nameController.clear();
+                _emailController.clear();
               },
+              //apenas um "label"
               child: Text('Add'),
             )
           ],

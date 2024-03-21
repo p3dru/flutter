@@ -48,10 +48,18 @@ class UserController {
   Reatribuição de valores à um usuário específico, primeiramente pesquisando 
   o id do elemento e depois, reatribuindo valores. passados.
   */
-  void updateUser(String id, String name, String email) {
+  void updateUser(String id, String name, String email, Function callback) {
+    //encontra o index do usuário na lista de usuários pelo id
     final index = _users.indexWhere((user) => user.id == id);
+    //se encontrado
     if (index != -1) {
+      //o usuário encontrado tem os dados substituídos pelos passados
       _users[index] = User(id: id, name: name, email: email);
+      /*
+      função callback para atualização do usuário. Útil para executar ações
+      adicionais como atualizar a interface do usuário
+      */
+      callback();
     }
   }
 }
